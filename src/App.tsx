@@ -8,7 +8,9 @@ import SignUp from "./pages/SignUp";
 import OfflinePayment from "./pages/OfflinePayment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
-import PaystackConfig from "./components/PaystackConfig";
+import Auth from "./pages/Auth";
+import AdminDashboard from "./pages/AdminDashboard";
+import AffiliateDashboard from "./pages/AffiliateDashboard";
 
 const queryClient = new QueryClient();
 
@@ -23,10 +25,12 @@ const App = () => (
           <Route path="/signup" element={<SignUp />} />
           <Route path="/offline-payment" element={<OfflinePayment />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/affiliate" element={<AffiliateDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <PaystackConfig />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

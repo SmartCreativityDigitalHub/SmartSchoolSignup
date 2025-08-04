@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PricingCalculator from "@/components/PricingCalculator";
 import FeatureComparison from "@/components/FeatureComparison";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PricingData {
   students: number;
@@ -13,6 +14,38 @@ interface PricingData {
 }
 
 const Index = () => {
+  useEffect(() => {
+    // Check for referral code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const referralCode = urlParams.get('ref');
+    
+    if (referralCode) {
+      // Store referral code in localStorage
+      localStorage.setItem('referral_code', referralCode);
+      
+      // Track the referral
+      const trackReferral = async () => {
+        try {
+          const visitorIp = await fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => data.ip)
+            .catch(() => 'unknown');
+
+          await supabase.functions.invoke('track-referral', {
+            body: {
+              referralCode,
+              visitorIp,
+              userAgent: navigator.userAgent,
+            },
+          });
+        } catch (error) {
+          console.error('Error tracking referral:', error);
+        }
+      };
+
+      trackReferral();
+    }
+  }, []);
   const navigate = useNavigate();
   const [pricingData, setPricingData] = useState<PricingData | null>(null);
 
