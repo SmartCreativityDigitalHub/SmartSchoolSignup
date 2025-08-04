@@ -14,7 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      payment_evidence: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          email: string
+          evidence_file_url: string | null
+          id: string
+          payment_date: string
+          payment_ref: string
+          school_name: string
+          school_phone: string
+          signup_id: string | null
+        }
+        Insert: {
+          amount_paid: number
+          created_at?: string
+          email: string
+          evidence_file_url?: string | null
+          id?: string
+          payment_date: string
+          payment_ref: string
+          school_name: string
+          school_phone: string
+          signup_id?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          email?: string
+          evidence_file_url?: string | null
+          id?: string
+          payment_date?: string
+          payment_ref?: string
+          school_name?: string
+          school_phone?: string
+          signup_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_evidence_signup_id_fkey"
+            columns: ["signup_id"]
+            isOneToOne: false
+            referencedRelation: "school_signups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_signups: {
+        Row: {
+          address: string | null
+          admin_name: string
+          city: string
+          created_at: string
+          email: string
+          employee_address: string
+          employee_blood_group: string | null
+          employee_dob: string | null
+          employee_email: string
+          employee_gender: string | null
+          employee_mobile: string
+          employee_name: string
+          employee_religion: string | null
+          id: string
+          mobile_no: string
+          payment_status: string | null
+          payment_type: string
+          referral_code: string | null
+          school_name: string
+          selected_plan: string
+          state: string
+          student_count: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          admin_name: string
+          city: string
+          created_at?: string
+          email: string
+          employee_address: string
+          employee_blood_group?: string | null
+          employee_dob?: string | null
+          employee_email: string
+          employee_gender?: string | null
+          employee_mobile: string
+          employee_name: string
+          employee_religion?: string | null
+          id?: string
+          mobile_no: string
+          payment_status?: string | null
+          payment_type: string
+          referral_code?: string | null
+          school_name: string
+          selected_plan: string
+          state: string
+          student_count: number
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          admin_name?: string
+          city?: string
+          created_at?: string
+          email?: string
+          employee_address?: string
+          employee_blood_group?: string | null
+          employee_dob?: string | null
+          employee_email?: string
+          employee_gender?: string | null
+          employee_mobile?: string
+          employee_name?: string
+          employee_religion?: string | null
+          id?: string
+          mobile_no?: string
+          payment_status?: string | null
+          payment_type?: string
+          referral_code?: string | null
+          school_name?: string
+          selected_plan?: string
+          state?: string
+          student_count?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
