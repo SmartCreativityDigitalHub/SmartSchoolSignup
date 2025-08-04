@@ -88,6 +88,59 @@ const OfflinePayment = () => {
 
       if (error) throw error;
 
+      // Send notification email to all stakeholders
+      try {
+        const emailRecipients = [
+          "signup@smartschool.sch.ng",
+          "support@smartschool.sch.ng", 
+          "smartcreativitydigitalhub@gmail.com",
+          "ezesamuelchinonso688@gmail.com",
+          data.email // School contact email
+        ];
+
+        await supabase.functions.invoke("send-email", {
+          body: {
+            to: emailRecipients,
+            subject: "Payment Evidence Submitted - SmartSchool",
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1 style="color: #3b82f6;">Payment Evidence Received</h1>
+                <p>A payment evidence has been submitted for SmartSchool registration.</p>
+                
+                <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h2>Payment Details:</h2>
+                  <ul style="list-style: none; padding: 0;">
+                    <li><strong>School:</strong> ${data.schoolName}</li>
+                    <li><strong>Contact Email:</strong> ${data.email}</li>
+                    <li><strong>Phone:</strong> ${data.schoolPhone}</li>
+                    <li><strong>Payment Date:</strong> ${data.paymentDate}</li>
+                    <li><strong>Payment Reference:</strong> ${data.paymentRef}</li>
+                    <li><strong>Amount Paid:</strong> ₦${data.amountPaid.toLocaleString()}</li>
+                    <li><strong>Evidence File:</strong> ${evidenceFileUrl ? 'Uploaded' : 'Not provided'}</li>
+                  </ul>
+                </div>
+                
+                <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h3>Action Required:</h3>
+                  <p>Please review the payment evidence and update the registration status accordingly.</p>
+                  ${evidenceFileUrl ? `<p><strong>Evidence File:</strong> Available in storage</p>` : ''}
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                  <p style="color: #6b7280; font-size: 14px;">
+                    SmartSchool Registration System<br>
+                    <a href="mailto:support@smartschool.sch.ng">support@smartschool.sch.ng</a>
+                  </p>
+                </div>
+              </div>
+            `,
+          },
+        });
+      } catch (emailError) {
+        console.error("Error sending notification email:", emailError);
+        // Don't fail the submission if email fails
+      }
+
       toast.success("Payment evidence submitted successfully!");
       navigate("/payment-success");
     } catch (error) {

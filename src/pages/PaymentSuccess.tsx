@@ -100,7 +100,7 @@ const PaymentSuccess = () => {
             Back to Home
           </Button>
           <Button
-            onClick={() => window.location.href = "https://smartschool.sch.ng"}
+            onClick={() => window.open("https://smartschool.sch.ng", "_blank")}
             className="px-8 py-3 text-lg gradient-bg hover:opacity-90 transition-smooth shadow-elegant hover:shadow-glow"
           >
             Visit SmartSchool

@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 interface EmailRequest {
-  to: string;
+  to: string | string[];
   subject: string;
   html: string;
 }
@@ -22,9 +22,11 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { to, subject, html }: EmailRequest = await req.json();
 
+    const recipients = Array.isArray(to) ? to : [to];
+    
     const emailResponse = await resend.emails.send({
       from: "SmartSchool <schoolsignup@smartschool.sch.ng>",
-      to: [to],
+      to: recipients,
       subject,
       html,
     });

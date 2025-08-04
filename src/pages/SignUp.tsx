@@ -95,11 +95,20 @@ const SignUp = () => {
       // Store signup ID for payment process
       localStorage.setItem("signupId", signupRecord.id);
       
-      // Send welcome email
+      // Send welcome email to multiple recipients
       try {
+        const emailRecipients = [
+          "signup@smartschool.sch.ng",
+          "support@smartschool.sch.ng", 
+          "smartcreativitydigitalhub@gmail.com",
+          "ezesamuelchinonso688@gmail.com",
+          data.email, // School admin email
+          data.employeeEmail // Employee email
+        ];
+
         await supabase.functions.invoke('send-email', {
           body: {
-            to: data.email,
+            to: emailRecipients,
             subject: 'Welcome to SmartSchool - Registration Successful!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -111,6 +120,15 @@ const SignUp = () => {
                   <h2>Registration Summary:</h2>
                   <ul style="list-style: none; padding: 0;">
                     <li><strong>School:</strong> ${data.schoolName}</li>
+                    <li><strong>Admin:</strong> ${data.adminName}</li>
+                    <li><strong>Email:</strong> ${data.email}</li>
+                    <li><strong>Phone:</strong> ${data.mobileNo}</li>
+                    <li><strong>Address:</strong> ${data.address}</li>
+                    <li><strong>City:</strong> ${data.city}</li>
+                    <li><strong>State:</strong> ${data.state}</li>
+                    <li><strong>Employee:</strong> ${data.employeeName}</li>
+                    <li><strong>Employee Email:</strong> ${data.employeeEmail}</li>
+                    <li><strong>Employee Phone:</strong> ${data.employeeMobile}</li>
                     <li><strong>Students:</strong> ${pricingData.students.toLocaleString()}</li>
                     <li><strong>Plan:</strong> ${pricingData.plan.charAt(0).toUpperCase() + pricingData.plan.slice(1)}</li>
                     <li><strong>Total Amount:</strong> ₦${pricingData.total.toLocaleString()}</li>
