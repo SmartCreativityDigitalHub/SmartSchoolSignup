@@ -8,6 +8,7 @@ import SignUp from "./pages/SignUp";
 import OfflinePayment from "./pages/OfflinePayment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
+import PaystackConfig from "./components/PaystackConfig";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <PaystackConfig />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

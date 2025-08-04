@@ -51,6 +51,27 @@ const OfflinePayment = () => {
         return;
       }
 
+      let evidenceFileUrl = null;
+
+      // Upload file if provided
+      if (data.evidenceFile && data.evidenceFile.length > 0) {
+        const file = data.evidenceFile[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${signupId}-${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('payment-evidence')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          console.error("Error uploading file:", uploadError);
+          toast.error("Error uploading file. Please try again.");
+          return;
+        }
+
+        evidenceFileUrl = uploadData.path;
+      }
+
       // Insert payment evidence into database
       const { error } = await supabase
         .from("payment_evidence")
@@ -62,8 +83,7 @@ const OfflinePayment = () => {
           payment_date: data.paymentDate,
           payment_ref: data.paymentRef,
           amount_paid: data.amountPaid,
-          // Note: File upload would require storage setup
-          evidence_file_url: null,
+          evidence_file_url: evidenceFileUrl,
         }]);
 
       if (error) throw error;

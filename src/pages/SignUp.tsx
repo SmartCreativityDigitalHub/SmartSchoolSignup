@@ -95,6 +95,58 @@ const SignUp = () => {
       // Store signup ID for payment process
       localStorage.setItem("signupId", signupRecord.id);
       
+      // Send welcome email
+      try {
+        await supabase.functions.invoke('send-email', {
+          body: {
+            to: data.email,
+            subject: 'Welcome to SmartSchool - Registration Successful!',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1 style="color: #3b82f6;">Welcome to SmartSchool!</h1>
+                <p>Dear ${data.adminName},</p>
+                <p>Thank you for registering <strong>${data.schoolName}</strong> with SmartSchool!</p>
+                
+                <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h2>Registration Summary:</h2>
+                  <ul style="list-style: none; padding: 0;">
+                    <li><strong>School:</strong> ${data.schoolName}</li>
+                    <li><strong>Students:</strong> ${pricingData.students.toLocaleString()}</li>
+                    <li><strong>Plan:</strong> ${pricingData.plan.charAt(0).toUpperCase() + pricingData.plan.slice(1)}</li>
+                    <li><strong>Total Amount:</strong> ₦${pricingData.total.toLocaleString()}</li>
+                    <li><strong>Payment Method:</strong> ${data.paymentType === 'online' ? 'Online (Paystack)' : 'Offline (Bank Transfer)'}</li>
+                  </ul>
+                </div>
+                
+                ${data.paymentType === 'offline' ? `
+                  <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3>Next Steps for Bank Transfer:</h3>
+                    <p>Please proceed with your payment using the bank details provided in your offline payment page.</p>
+                    <p>Once payment is made, submit your payment evidence through the system.</p>
+                  </div>
+                ` : `
+                  <p>Your online payment is being processed. You'll receive confirmation once completed.</p>
+                `}
+                
+                <p>We're excited to help transform your school management experience!</p>
+                <p>If you have any questions, please don't hesitate to contact our support team.</p>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                  <p style="color: #6b7280; font-size: 14px;">
+                    Best regards,<br>
+                    The SmartSchool Team<br>
+                    <a href="mailto:support@smartschool.sch.ng">support@smartschool.sch.ng</a>
+                  </p>
+                </div>
+              </div>
+            `
+          }
+        });
+      } catch (emailError) {
+        console.error("Error sending email:", emailError);
+        // Don't fail the registration if email fails
+      }
+      
       toast.success("Registration successful!");
 
       // Redirect based on payment type
@@ -128,6 +180,15 @@ const SignUp = () => {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/")}
+              className="text-sm"
+            >
+              ← Back to Pricing
+            </Button>
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold gradient-bg bg-clip-text text-transparent">
             Complete Your Registration
           </h1>
