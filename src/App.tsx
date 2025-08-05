@@ -8,6 +8,8 @@ import SignUp from "./pages/SignUp";
 import OfflinePayment from "./pages/OfflinePayment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
+import Contact from "./pages/Contact";
+import Renew from "./pages/Renew";
 
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
@@ -23,6 +25,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/renew" element={<Renew />} />
           <Route path="/offline-payment" element={<OfflinePayment />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           
