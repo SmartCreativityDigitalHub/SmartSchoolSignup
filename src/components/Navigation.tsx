@@ -13,21 +13,9 @@ const Navigation = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <Link to="/admin-login">
-              <Button variant="outline" size="sm">
-                Admin Login
-              </Button>
-            </Link>
-            <Link to="/affiliate-login">
-              <Button variant="outline" size="sm">
-                Affiliate Login
-              </Button>
-            </Link>
-            <Link to="/affiliate-signup">
-              <Button variant="default" size="sm">
-                Join as Affiliate
-              </Button>
-            </Link>
+            <Button variant="ghost" asChild>
+              <Link to="/admin-login">Admin Login</Link>
+            </Button>
           </div>
         </div>
       </div>

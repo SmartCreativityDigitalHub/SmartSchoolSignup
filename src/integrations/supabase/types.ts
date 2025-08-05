@@ -41,98 +41,6 @@ export type Database = {
         }
         Relationships: []
       }
-      affiliates: {
-        Row: {
-          account_name: string | null
-          account_number: string | null
-          affiliate_code: string
-          bank_name: string | null
-          commission_rate: number | null
-          created_at: string
-          id: string
-          pending_amount: number | null
-          status: string | null
-          total_earnings: number | null
-          updated_at: string
-          user_id: string
-          withdrawn_amount: number | null
-        }
-        Insert: {
-          account_name?: string | null
-          account_number?: string | null
-          affiliate_code: string
-          bank_name?: string | null
-          commission_rate?: number | null
-          created_at?: string
-          id?: string
-          pending_amount?: number | null
-          status?: string | null
-          total_earnings?: number | null
-          updated_at?: string
-          user_id: string
-          withdrawn_amount?: number | null
-        }
-        Update: {
-          account_name?: string | null
-          account_number?: string | null
-          affiliate_code?: string
-          bank_name?: string | null
-          commission_rate?: number | null
-          created_at?: string
-          id?: string
-          pending_amount?: number | null
-          status?: string | null
-          total_earnings?: number | null
-          updated_at?: string
-          user_id?: string
-          withdrawn_amount?: number | null
-        }
-        Relationships: []
-      }
-      commission_payments: {
-        Row: {
-          affiliate_id: string
-          amount: number
-          created_at: string
-          id: string
-          notes: string | null
-          payment_method: string | null
-          payment_reference: string | null
-          status: string | null
-          updated_at: string
-        }
-        Insert: {
-          affiliate_id: string
-          amount: number
-          created_at?: string
-          id?: string
-          notes?: string | null
-          payment_method?: string | null
-          payment_reference?: string | null
-          status?: string | null
-          updated_at?: string
-        }
-        Update: {
-          affiliate_id?: string
-          amount?: number
-          created_at?: string
-          id?: string
-          notes?: string | null
-          payment_method?: string | null
-          payment_reference?: string | null
-          status?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "commission_payments_affiliate_id_fkey"
-            columns: ["affiliate_id"]
-            isOneToOne: false
-            referencedRelation: "affiliates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       payment_evidence: {
         Row: {
           amount_paid: number
@@ -246,63 +154,6 @@ export type Database = {
         }
         Relationships: []
       }
-      referrals: {
-        Row: {
-          affiliate_id: string
-          commission_amount: number | null
-          commission_paid: boolean | null
-          created_at: string
-          id: string
-          referral_code: string
-          school_signup_id: string | null
-          status: string | null
-          updated_at: string
-          user_agent: string | null
-          visitor_ip: string | null
-        }
-        Insert: {
-          affiliate_id: string
-          commission_amount?: number | null
-          commission_paid?: boolean | null
-          created_at?: string
-          id?: string
-          referral_code: string
-          school_signup_id?: string | null
-          status?: string | null
-          updated_at?: string
-          user_agent?: string | null
-          visitor_ip?: string | null
-        }
-        Update: {
-          affiliate_id?: string
-          commission_amount?: number | null
-          commission_paid?: boolean | null
-          created_at?: string
-          id?: string
-          referral_code?: string
-          school_signup_id?: string | null
-          status?: string | null
-          updated_at?: string
-          user_agent?: string | null
-          visitor_ip?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "referrals_affiliate_id_fkey"
-            columns: ["affiliate_id"]
-            isOneToOne: false
-            referencedRelation: "affiliates"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "referrals_school_signup_id_fkey"
-            columns: ["school_signup_id"]
-            isOneToOne: false
-            referencedRelation: "school_signups"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       school_signups: {
         Row: {
           address: string | null
@@ -322,7 +173,6 @@ export type Database = {
           mobile_no: string
           payment_status: string | null
           payment_type: string
-          referral_code: string | null
           school_name: string
           selected_plan: string
           state: string
@@ -348,7 +198,6 @@ export type Database = {
           mobile_no: string
           payment_status?: string | null
           payment_type: string
-          referral_code?: string | null
           school_name: string
           selected_plan: string
           state: string
@@ -374,7 +223,6 @@ export type Database = {
           mobile_no?: string
           payment_status?: string | null
           payment_type?: string
-          referral_code?: string | null
           school_name?: string
           selected_plan?: string
           state?: string
@@ -383,44 +231,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
-      }
-      withdrawal_requests: {
-        Row: {
-          admin_notes: string | null
-          affiliate_id: string
-          amount: number
-          created_at: string
-          id: string
-          status: string | null
-          updated_at: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          affiliate_id: string
-          amount: number
-          created_at?: string
-          id?: string
-          status?: string | null
-          updated_at?: string
-        }
-        Update: {
-          admin_notes?: string | null
-          affiliate_id?: string
-          amount?: number
-          created_at?: string
-          id?: string
-          status?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "withdrawal_requests_affiliate_id_fkey"
-            columns: ["affiliate_id"]
-            isOneToOne: false
-            referencedRelation: "affiliates"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
