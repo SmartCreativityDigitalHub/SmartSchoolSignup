@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PricingCalculator from "@/components/PricingCalculator";
 import FeatureComparison from "@/components/FeatureComparison";
+import Navigation from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PricingData {
@@ -56,8 +57,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <div className="py-12 px-4">
+        <div className="max-w-7xl mx-auto space-y-12">
         {/* Main Navigation Tabs */}
         <Tabs defaultValue="pricing" className="w-full">
           <div className="flex justify-center mb-8">
@@ -93,6 +96,7 @@ const Index = () => {
             <span className="text-primary ml-2">For support: +234 906 869 1062</span>
           </p>
         </footer>
+        </div>
       </div>
     </div>
   );
