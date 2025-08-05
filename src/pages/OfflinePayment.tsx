@@ -142,7 +142,16 @@ const OfflinePayment = () => {
       }
 
       toast.success("Payment evidence submitted successfully!");
-      navigate("/payment-success");
+      
+      // Check if this is from renewal flow
+      const renewalId = localStorage.getItem('renewalId');
+      if (renewalId) {
+        localStorage.removeItem('renewalId');
+        localStorage.removeItem('renewalAmount');
+        navigate("/renewal-success");
+      } else {
+        navigate("/payment-success");
+      }
     } catch (error) {
       console.error("Error submitting payment evidence:", error);
       toast.error("An error occurred while submitting your payment evidence. Please try again.");

@@ -7,9 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle, CreditCard, Users, School } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
+import { useNavigate } from "react-router-dom";
 
 interface DiscountCode {
   id: string;
@@ -26,18 +28,20 @@ const Renew = () => {
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
   const [discountError, setDiscountError] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
     studentCount: "",
     schoolName: "",
     phoneNumber: "",
     email: "",
-    selectedPlan: "starter"
+    selectedPlan: "starter",
+    paymentMethod: "online"
   });
 
   const planPrices = {
-    starter: 2000,
-    standard: 4000
+    starter: 1000,
+    standard: 2000
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -197,27 +201,32 @@ const Renew = () => {
         }
       }
 
-      // Initiate payment via Paystack
-      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-paystack-payment', {
-        body: {
-          email: formData.email,
-          amount: pricing.totalAmount,
-          metadata: {
-            renewal_id: renewalRecord.id,
-            school_name: formData.schoolName,
-            student_count: pricing.students,
-            plan: formData.selectedPlan
+      let paymentData = null;
+      
+      // Only initiate Paystack payment for online method
+      if (formData.paymentMethod === 'online') {
+        const { data: paystackData, error: paymentError } = await supabase.functions.invoke('create-paystack-payment', {
+          body: {
+            email: formData.email,
+            amount: pricing.totalAmount,
+            metadata: {
+              renewal_id: renewalRecord.id,
+              school_name: formData.schoolName,
+              student_count: pricing.students,
+              plan: formData.selectedPlan
+            }
           }
-        }
-      });
+        });
 
-      if (paymentError) throw paymentError;
+        if (paymentError) throw paymentError;
+        paymentData = paystackData;
 
-      // Update renewal with payment reference
-      await supabase
-        .from('renewals')
-        .update({ payment_reference: paymentData.reference })
-        .eq('id', renewalRecord.id);
+        // Update renewal with payment reference
+        await supabase
+          .from('renewals')
+          .update({ payment_reference: paymentData.reference })
+          .eq('id', renewalRecord.id);
+      }
 
       // Send email notification
       await supabase.functions.invoke('send-email', {
@@ -231,17 +240,26 @@ const Renew = () => {
             <p><strong>Phone:</strong> ${formData.phoneNumber}</p>
             <p><strong>Students:</strong> ${pricing.students}</p>
             <p><strong>Plan:</strong> ${formData.selectedPlan}</p>
+            <p><strong>Payment Method:</strong> ${formData.paymentMethod}</p>
             <p><strong>Base Amount:</strong> ${formatCurrency(pricing.baseAmount)}</p>
             ${appliedDiscount ? `<p><strong>Discount Applied:</strong> ${appliedDiscount.code_number} (-${formatCurrency(pricing.discountAmount)})</p>` : ''}
             <p><strong>Total Amount:</strong> ${formatCurrency(pricing.totalAmount)}</p>
-            <p><strong>Payment Reference:</strong> ${paymentData.reference}</p>
+            <p><strong>Payment Reference:</strong> ${paymentData?.reference || 'Offline Payment'}</p>
           `
         }
       });
 
-      // Redirect to Paystack
-      if (paymentData.authorization_url) {
-        window.location.href = paymentData.authorization_url;
+      // Handle payment method
+      if (formData.paymentMethod === 'online') {
+        // Redirect to Paystack for online payment
+        if (paymentData.authorization_url) {
+          window.location.href = paymentData.authorization_url;
+        }
+      } else {
+        // Store renewal ID and redirect to offline payment
+        localStorage.setItem('renewalId', renewalRecord.id);
+        localStorage.setItem('renewalAmount', pricing.totalAmount.toString());
+        navigate('/offline-payment');
       }
 
     } catch (error: any) {
@@ -338,10 +356,25 @@ const Renew = () => {
                       <SelectValue placeholder="Select a plan" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="starter">Starter Plan (₦2,000 per student)</SelectItem>
-                      <SelectItem value="standard">Standard Plan (₦4,000 per student)</SelectItem>
+                      <SelectItem value="starter">Starter Plan (₦1,000 per student)</SelectItem>
+                      <SelectItem value="standard">Standard Plan (₦2,000 per student)</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                {/* Payment Method Selection */}
+                <div>
+                  <Label htmlFor="paymentMethod">Payment Method *</Label>
+                  <RadioGroup value={formData.paymentMethod} onValueChange={(value) => handleInputChange('paymentMethod', value)}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="online" id="online" />
+                      <Label htmlFor="online">Online Payment via Paystack</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="offline" id="offline" />
+                      <Label htmlFor="offline">Offline Payment (Bank Transfer)</Label>
+                    </div>
+                  </RadioGroup>
                 </div>
 
                 {/* Discount Code Section */}
