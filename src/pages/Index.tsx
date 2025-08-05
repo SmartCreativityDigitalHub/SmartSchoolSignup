@@ -58,7 +58,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
       <div className="py-12 px-4">
         <div className="max-w-7xl mx-auto space-y-12">
         {/* Main Navigation Tabs */}

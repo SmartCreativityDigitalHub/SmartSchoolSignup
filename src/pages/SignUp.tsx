@@ -546,9 +546,19 @@ const SignUp = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Religion</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter religion" {...field} />
-                          </FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select religion" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="christianity">Christianity</SelectItem>
+                              <SelectItem value="islam">Islam</SelectItem>
+                              <SelectItem value="traditional">Traditional</SelectItem>
+                              <SelectItem value="others">Others</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -562,9 +572,23 @@ const SignUp = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Blood Group</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter blood group" {...field} />
-                          </FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select blood group" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="A+">A+</SelectItem>
+                              <SelectItem value="A-">A-</SelectItem>
+                              <SelectItem value="B+">B+</SelectItem>
+                              <SelectItem value="B-">B-</SelectItem>
+                              <SelectItem value="AB+">AB+</SelectItem>
+                              <SelectItem value="AB-">AB-</SelectItem>
+                              <SelectItem value="O+">O+</SelectItem>
+                              <SelectItem value="O-">O-</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}

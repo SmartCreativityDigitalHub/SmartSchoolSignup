@@ -15,7 +15,6 @@ const OfflineRenewalPayment = () => {
     schoolName: "",
     email: "",
     phoneNumber: "",
-    selectedPlan: "",
     totalAmount: "",
     paymentDate: "",
     notes: "",
@@ -26,28 +25,12 @@ const OfflineRenewalPayment = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const plans = [
-    { value: "basic", label: "Basic Plan - ₦50,000", amount: 50000 },
-    { value: "standard", label: "Standard Plan - ₦100,000", amount: 100000 },
-    { value: "premium", label: "Premium Plan - ₦150,000", amount: 150000 }
-  ];
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-
-    // Auto-calculate amount when plan is selected
-    if (field === "selectedPlan") {
-      const selectedPlanObj = plans.find(p => p.value === value);
-      if (selectedPlanObj) {
-        setFormData(prev => ({
-          ...prev,
-          totalAmount: selectedPlanObj.amount.toString()
-        }));
-      }
-    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +70,7 @@ const OfflineRenewalPayment = () => {
     e.preventDefault();
     
     if (!formData.schoolName || !formData.email || !formData.phoneNumber || 
-        !formData.selectedPlan || !formData.totalAmount || !formData.paymentDate) {
+        !formData.totalAmount || !formData.paymentDate) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
@@ -114,7 +97,7 @@ const OfflineRenewalPayment = () => {
           school_name: formData.schoolName,
           email: formData.email,
           phone_number: formData.phoneNumber,
-          selected_plan: formData.selectedPlan,
+          selected_plan: "renewal",
           total_amount: parseFloat(formData.totalAmount),
           payment_date: formData.paymentDate,
           payment_method: formData.paymentMethod,
@@ -134,7 +117,6 @@ const OfflineRenewalPayment = () => {
         schoolName: "",
         email: "",
         phoneNumber: "",
-        selectedPlan: "",
         totalAmount: "",
         paymentDate: "",
         notes: "",
@@ -252,33 +234,19 @@ const OfflineRenewalPayment = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="selectedPlan">Select Plan *</Label>
-                  <Select value={formData.selectedPlan} onValueChange={(value) => handleInputChange("selectedPlan", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose a plan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {plans.map((plan) => (
-                        <SelectItem key={plan.value} value={plan.value}>
-                          {plan.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="totalAmount">Total Amount (₦) *</Label>
+                  <Label htmlFor="totalAmount">Amount Paid (₦) *</Label>
                   <Input
                     id="totalAmount"
                     type="number"
                     value={formData.totalAmount}
                     onChange={(e) => handleInputChange("totalAmount", e.target.value)}
+                    placeholder="Enter amount paid"
                     required
                   />
                 </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-1">
 
                 <div className="space-y-2">
                   <Label htmlFor="paymentDate">Payment Date *</Label>
