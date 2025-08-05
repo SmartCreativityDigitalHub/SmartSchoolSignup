@@ -19,7 +19,7 @@ interface SignUpFormData {
   city: string;
   state: string;
   address?: string;
-  referralCode?: string;
+  
   employeeName: string;
   employeeGender?: string;
   employeeReligion?: string;
