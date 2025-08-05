@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliates: {
+        Row: {
+          code: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_evidence: {
         Row: {
           amount_paid: number
@@ -173,6 +203,7 @@ export type Database = {
           mobile_no: string
           payment_status: string | null
           payment_type: string
+          referral_code: string | null
           school_name: string
           selected_plan: string
           state: string
@@ -198,6 +229,7 @@ export type Database = {
           mobile_no: string
           payment_status?: string | null
           payment_type: string
+          referral_code?: string | null
           school_name: string
           selected_plan: string
           state: string
@@ -223,6 +255,7 @@ export type Database = {
           mobile_no?: string
           payment_status?: string | null
           payment_type?: string
+          referral_code?: string | null
           school_name?: string
           selected_plan?: string
           state?: string

@@ -19,6 +19,7 @@ interface SignUpFormData {
   city: string;
   state: string;
   address?: string;
+  referralCode?: string;
   
   employeeName: string;
   employeeGender?: string;
@@ -65,6 +66,23 @@ const SignUp = () => {
       console.log("Starting signup process with data:", data);
       console.log("Pricing data:", pricingData);
       
+      // Check if referral code exists and is valid
+      let affiliateInfo = null;
+      if (data.referralCode?.trim()) {
+        const { data: affiliate } = await supabase
+          .from("affiliates")
+          .select("*")
+          .eq("code", data.referralCode.trim())
+          .single();
+        
+        if (affiliate) {
+          affiliateInfo = affiliate;
+          console.log("Valid referral code found:", affiliate);
+        } else {
+          console.log("Invalid referral code:", data.referralCode);
+        }
+      }
+
       // Insert signup data into database
       const { data: signupRecord, error } = await supabase
         .from("school_signups")
@@ -76,6 +94,7 @@ const SignUp = () => {
           city: data.city,
           state: data.state,
           address: data.address,
+          referral_code: data.referralCode?.trim() || null,
           employee_name: data.employeeName,
           employee_gender: data.employeeGender,
           employee_religion: data.employeeReligion,
@@ -173,6 +192,61 @@ const SignUp = () => {
       } catch (emailError) {
         console.error("Error sending email:", emailError);
         // Don't fail the registration if email fails
+      }
+
+      // Send affiliate notification email if referral code is valid
+      if (affiliateInfo) {
+        try {
+          console.log("Sending affiliate notification email to:", affiliateInfo.email);
+          const affiliateEmailResult = await supabase.functions.invoke('send-email', {
+            body: {
+              to: [affiliateInfo.email],
+              subject: 'Congratulations! New School Referral Successful',
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h1 style="color: #3b82f6;">Congratulations ${affiliateInfo.name}!</h1>
+                  <p>Great news! You have successfully referred a new school to SmartSchool.</p>
+                  
+                  <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+                    <h2>Referral Details:</h2>
+                    <ul style="list-style: none; padding: 0;">
+                      <li><strong>School Name:</strong> ${data.schoolName}</li>
+                      <li><strong>Admin Name:</strong> ${data.adminName}</li>
+                      <li><strong>Email:</strong> ${data.email}</li>
+                      <li><strong>Phone:</strong> ${data.mobileNo}</li>
+                      <li><strong>Location:</strong> ${data.city}, ${data.state}</li>
+                      <li><strong>Students:</strong> ${pricingData.students.toLocaleString()}</li>
+                      <li><strong>Plan:</strong> ${pricingData.plan.charAt(0).toUpperCase() + pricingData.plan.slice(1)}</li>
+                      <li><strong>Total Amount:</strong> ₦${pricingData.total.toLocaleString()}</li>
+                      <li><strong>Your Referral Code:</strong> ${affiliateInfo.code}</li>
+                      <li><strong>Registration Date:</strong> ${new Date().toLocaleDateString()}</li>
+                    </ul>
+                  </div>
+                  
+                  <div style="background: #dcfce7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #16a34a;">🎉 Thank you for your referral!</h3>
+                    <p>Your referral has been successfully registered and we'll be in touch regarding your commission.</p>
+                  </div>
+                  
+                  <p>Keep up the great work promoting SmartSchool!</p>
+                  
+                  <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 14px;">
+                      Best regards,<br>
+                      The SmartSchool Team<br>
+                      <a href="mailto:support@smartschool.sch.ng">support@smartschool.sch.ng</a>
+                    </p>
+                  </div>
+                </div>
+              `
+            }
+          });
+          
+          console.log("Affiliate email send result:", affiliateEmailResult);
+        } catch (affiliateEmailError) {
+          console.error("Error sending affiliate email:", affiliateEmailError);
+          // Don't fail the registration if affiliate email fails
+        }
       }
       
       toast.success("Registration successful!");
@@ -399,6 +473,20 @@ const SignUp = () => {
                         <FormLabel>Address</FormLabel>
                         <FormControl>
                           <Textarea placeholder="Enter full address" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="referralCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Referral Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter referral code (optional)" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
