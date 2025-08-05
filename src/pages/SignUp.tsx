@@ -62,6 +62,9 @@ const SignUp = () => {
     setIsSubmitting(true);
     
     try {
+      console.log("Starting signup process with data:", data);
+      console.log("Pricing data:", pricingData);
+      
       // Insert signup data into database
       const { data: signupRecord, error } = await supabase
         .from("school_signups")
@@ -73,7 +76,6 @@ const SignUp = () => {
           city: data.city,
           state: data.state,
           address: data.address,
-          referral_code: data.referralCode,
           employee_name: data.employeeName,
           employee_gender: data.employeeGender,
           employee_religion: data.employeeReligion,
@@ -90,8 +92,13 @@ const SignUp = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database insertion error:", error);
+        throw error;
+      }
 
+      console.log("Signup record created successfully:", signupRecord);
+      
       // Store signup ID for payment process
       localStorage.setItem("signupId", signupRecord.id);
       
@@ -106,7 +113,8 @@ const SignUp = () => {
           data.employeeEmail // Employee email
         ];
 
-        await supabase.functions.invoke('send-email', {
+        console.log("Sending email to recipients:", emailRecipients);
+        const emailResult = await supabase.functions.invoke('send-email', {
           body: {
             to: emailRecipients,
             subject: 'Welcome to SmartSchool - Registration Successful!',
@@ -160,6 +168,8 @@ const SignUp = () => {
             `
           }
         });
+        
+        console.log("Email send result:", emailResult);
       } catch (emailError) {
         console.error("Error sending email:", emailError);
         // Don't fail the registration if email fails
@@ -171,6 +181,7 @@ const SignUp = () => {
       if (data.paymentType === "online") {
         // Initialize Paystack payment
         try {
+          console.log("Initializing Paystack payment...");
           const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-paystack-payment', {
             body: {
               email: data.email,
@@ -187,9 +198,12 @@ const SignUp = () => {
           });
 
           if (paymentError) {
+            console.error("Paystack payment error:", paymentError);
             throw paymentError;
           }
 
+          console.log("Paystack response:", paymentData);
+          
           if (paymentData?.data?.authorization_url) {
             // Redirect to Paystack payment page
             window.location.href = paymentData.data.authorization_url;
@@ -391,19 +405,6 @@ const SignUp = () => {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="referralCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Referral Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter referral code (optional)" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </CardContent>
               </Card>
 
