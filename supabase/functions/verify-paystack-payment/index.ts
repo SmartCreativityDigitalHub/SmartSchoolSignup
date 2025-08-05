@@ -18,26 +18,18 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { reference }: VerificationRequest = await req.json();
 
-    // Get Paystack config from admin_configs table
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
-    const { data: configs } = await supabase
-      .from("admin_configs")
-      .select("config_key, config_value")
-      .in("config_key", ["paystack_secret_key"]);
-
-    if (!configs || configs.length === 0) {
-      throw new Error("Paystack configuration not found");
-    }
-
-    const paystackSecretKey = configs.find(c => c.config_key === "paystack_secret_key")?.config_value;
+    // Get Paystack secret key from Supabase secrets
+    const paystackSecretKey = Deno.env.get("PAYSTACK_SECRET_KEY");
 
     if (!paystackSecretKey) {
       throw new Error("Paystack secret key not configured");
     }
+
+    // Create Supabase client for database operations
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
 
     // Verify transaction with Paystack
     const paystackResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
