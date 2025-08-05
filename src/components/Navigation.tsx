@@ -22,6 +22,12 @@ const Navigation = () => {
             <Button variant="ghost" asChild>
               <Link to="/report">Report</Link>
             </Button>
+            <Button variant="ghost" asChild>
+              <Link to="/all-pages">All Pages</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link to="/report-clean">Report (Clean)</Link>
+            </Button>
           </div>
         </div>
       </div>

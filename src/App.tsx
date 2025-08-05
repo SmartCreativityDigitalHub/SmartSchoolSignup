@@ -12,6 +12,8 @@ import Contact from "./pages/Contact";
 import Renew from "./pages/Renew";
 import RenewalSuccess from "./pages/RenewalSuccess";
 import Report from "./pages/Report";
+import AllPages from "./pages/AllPages";
+import ReportClean from "./pages/ReportClean";
 
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/renew" element={<Renew />} />
           <Route path="/renewal-success" element={<RenewalSuccess />} />
           <Route path="/report" element={<Report />} />
+          <Route path="/all-pages" element={<AllPages />} />
+          <Route path="/report-clean" element={<ReportClean />} />
           <Route path="/offline-payment" element={<OfflinePayment />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           

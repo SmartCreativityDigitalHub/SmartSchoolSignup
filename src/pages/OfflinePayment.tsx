@@ -45,9 +45,10 @@ const OfflinePayment = () => {
     
     try {
       const signupId = localStorage.getItem("signupId");
+      const renewalId = localStorage.getItem("renewalId");
       
-      if (!signupId) {
-        toast.error("No signup record found. Please complete registration first.");
+      if (!signupId && !renewalId) {
+        toast.error("No signup or renewal record found. Please complete registration or renewal first.");
         return;
       }
 
@@ -57,7 +58,7 @@ const OfflinePayment = () => {
       if (data.evidenceFile && data.evidenceFile.length > 0) {
         const file = data.evidenceFile[0];
         const fileExt = file.name.split('.').pop();
-        const fileName = `${signupId}-${Date.now()}.${fileExt}`;
+        const fileName = `${signupId || renewalId}-${Date.now()}.${fileExt}`;
         
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('payment-evidence')
@@ -76,7 +77,7 @@ const OfflinePayment = () => {
       const { error } = await supabase
         .from("payment_evidence")
         .insert([{
-          signup_id: signupId,
+          signup_id: signupId || renewalId,
           school_name: data.schoolName,
           school_phone: data.schoolPhone,
           email: data.email,
@@ -144,8 +145,8 @@ const OfflinePayment = () => {
       toast.success("Payment evidence submitted successfully!");
       
       // Check if this is from renewal flow
-      const renewalId = localStorage.getItem('renewalId');
-      if (renewalId) {
+      const currentRenewalId = localStorage.getItem('renewalId');
+      if (currentRenewalId) {
         localStorage.removeItem('renewalId');
         localStorage.removeItem('renewalAmount');
         navigate("/renewal-success");

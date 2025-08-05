@@ -7,9 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ChevronLeft, ChevronRight, FileText, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import Navigation from "@/components/Navigation";
 
-const Report = () => {
+const ReportClean = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -224,10 +223,8 @@ const Report = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background py-8 px-4">
+      <div className="container mx-auto">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-primary mb-4">Report</h1>
@@ -294,4 +291,4 @@ const Report = () => {
   );
 };
 
-export default Report;
+export default ReportClean;

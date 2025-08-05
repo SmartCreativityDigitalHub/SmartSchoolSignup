@@ -209,6 +209,8 @@ const Renew = () => {
           body: {
             email: formData.email,
             amount: pricing.totalAmount,
+            reference: `REN_${renewalRecord.id}_${Date.now()}`,
+            callback_url: `${window.location.origin}/renewal-success`,
             metadata: {
               renewal_id: renewalRecord.id,
               school_name: formData.schoolName,
@@ -224,7 +226,7 @@ const Renew = () => {
         // Update renewal with payment reference
         await supabase
           .from('renewals')
-          .update({ payment_reference: paymentData.reference })
+          .update({ payment_reference: paystackData.data?.reference })
           .eq('id', renewalRecord.id);
       }
 
@@ -252,8 +254,8 @@ const Renew = () => {
       // Handle payment method
       if (formData.paymentMethod === 'online') {
         // Redirect to Paystack for online payment
-        if (paymentData.authorization_url) {
-          window.location.href = paymentData.authorization_url;
+        if (paymentData.data?.authorization_url) {
+          window.location.href = paymentData.data.authorization_url;
         }
       } else {
         // Store renewal ID and redirect to offline payment
