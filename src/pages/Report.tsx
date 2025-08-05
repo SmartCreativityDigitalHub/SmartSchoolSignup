@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ChevronLeft, ChevronRight, FileText, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import Navigation from "@/components/Navigation";
+
 
 const Report = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -27,7 +27,8 @@ const Report = () => {
     { value: "renewals", label: "Renewals" },
     { value: "payment_evidence", label: "Payment Evidence" },
     { value: "profiles", label: "Profile" },
-    { value: "school_signups", label: "School Signups" }
+    { value: "school_signups", label: "School Signups" },
+    { value: "offline_subscription_renewals", label: "Offline Subscription Renewal" }
   ];
 
   const handleFilter = async () => {
@@ -125,7 +126,8 @@ const Report = () => {
       );
     }
 
-    const columns = Object.keys(data[0]);
+    // Show all columns for school_signups
+    const columnsToShow = selectedCategory === 'school_signups' ? Object.keys(data[0]) : Object.keys(data[0]).slice(0, 5);
     const startIndex = (currentPage - 1) * recordsPerPage;
 
     return (
@@ -136,17 +138,17 @@ const Report = () => {
           </Button>
         </div>
         
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="font-semibold">SL</TableHead>
-                {columns.slice(0, 5).map((column) => (
+                {columnsToShow.map((column) => (
                   <TableHead key={column} className="font-semibold">
                     {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </TableHead>
                 ))}
-                {selectedCategory === 'payment_evidence' && (
+                {(selectedCategory === 'payment_evidence' || selectedCategory === 'offline_subscription_renewals') && (
                   <TableHead className="font-semibold">Download</TableHead>
                 )}
               </TableRow>
@@ -157,7 +159,7 @@ const Report = () => {
                   <TableCell className="font-medium">
                     {startIndex + index + 1}
                   </TableCell>
-                  {columns.slice(0, 5).map((column) => (
+                  {columnsToShow.map((column) => (
                     <TableCell key={column} className="max-w-xs truncate">
                       {formatValue(row[column], column)}
                     </TableCell>
@@ -172,6 +174,26 @@ const Report = () => {
                             const { data: publicURL } = supabase.storage
                               .from('payment-evidence')
                               .getPublicUrl(row.evidence_file_url);
+                            window.open(publicURL.publicUrl, '_blank');
+                          }}
+                        >
+                          View File
+                        </Button>
+                      ) : (
+                        <span className="text-muted-foreground">No file</span>
+                      )}
+                    </TableCell>
+                  )}
+                  {selectedCategory === 'offline_subscription_renewals' && (
+                    <TableCell>
+                      {row.payment_evidence_url ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const { data: publicURL } = supabase.storage
+                              .from('payment-evidence')
+                              .getPublicUrl(row.payment_evidence_url);
                             window.open(publicURL.publicUrl, '_blank');
                           }}
                         >
@@ -225,8 +247,6 @@ const Report = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">

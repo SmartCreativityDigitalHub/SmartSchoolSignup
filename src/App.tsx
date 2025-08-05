@@ -13,10 +13,11 @@ import Renew from "./pages/Renew";
 import RenewalSuccess from "./pages/RenewalSuccess";
 import Report from "./pages/Report";
 import AllPages from "./pages/AllPages";
-import ReportClean from "./pages/ReportClean";
+
 
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
+import OfflineRenewalPayment from "./pages/OfflineRenewalPayment";
 
 const queryClient = new QueryClient();
 
@@ -34,12 +35,13 @@ const App = () => (
           <Route path="/renewal-success" element={<RenewalSuccess />} />
           <Route path="/report" element={<Report />} />
           <Route path="/all-pages" element={<AllPages />} />
-          <Route path="/report-clean" element={<ReportClean />} />
+          
           <Route path="/offline-payment" element={<OfflinePayment />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/offline-renewal-payment" element={<OfflineRenewalPayment />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

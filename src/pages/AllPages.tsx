@@ -35,6 +35,12 @@ const AllPages = () => {
       icon: DollarSign
     },
     {
+      name: "Offline Renewal Payment",
+      path: "/offline-renewal-payment", 
+      description: "Bank transfer renewal payment evidence",
+      icon: RefreshCw
+    },
+    {
       name: "Payment Success",
       path: "/payment-success",
       description: "Payment confirmation page",
