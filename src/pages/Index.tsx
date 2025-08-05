@@ -88,13 +88,6 @@ const Index = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Footer */}
-        <footer className="text-center py-8 border-t">
-          <p className="text-muted-foreground">
-            © 2024 SmartSchool. All rights reserved. | 
-            <span className="text-primary ml-2">For support: +234 906 869 1062</span>
-          </p>
-        </footer>
         </div>
       </div>
     </div>
