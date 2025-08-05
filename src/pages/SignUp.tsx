@@ -169,10 +169,37 @@ const SignUp = () => {
 
       // Redirect based on payment type
       if (data.paymentType === "online") {
-        // For online payment, redirect to Paystack (simulated)
-        const paystackUrl = `https://paystack.com/pay/smartschool?amount=${pricingData.total * 100}&email=${data.email}`;
-        window.open(paystackUrl, '_blank');
-        navigate("/payment-success");
+        // Initialize Paystack payment
+        try {
+          const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-paystack-payment', {
+            body: {
+              email: data.email,
+              amount: pricingData.total,
+              reference: `SS_${signupRecord.id}_${Date.now()}`,
+              callback_url: `${window.location.origin}/payment-success`,
+              metadata: {
+                signup_id: signupRecord.id,
+                school_name: data.schoolName,
+                plan: pricingData.plan,
+                students: pricingData.students,
+              },
+            },
+          });
+
+          if (paymentError) {
+            throw paymentError;
+          }
+
+          if (paymentData?.data?.authorization_url) {
+            // Redirect to Paystack payment page
+            window.location.href = paymentData.data.authorization_url;
+          } else {
+            throw new Error("Failed to get payment URL");
+          }
+        } catch (paymentError) {
+          console.error("Payment initialization error:", paymentError);
+          toast.error("Failed to initialize payment. Please try again or use offline payment.");
+        }
       } else {
         // For offline payment, redirect to bank details page
         navigate("/offline-payment");
