@@ -14,7 +14,10 @@ const Navigation = () => {
           
           <div className="flex items-center space-x-4">
             <Button variant="ghost" asChild>
-              <Link to="/admin-login">Admin Login</Link>
+              <Link to="/contact">Contact Us</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link to="/renew">Renew</Link>
             </Button>
           </div>
         </div>
