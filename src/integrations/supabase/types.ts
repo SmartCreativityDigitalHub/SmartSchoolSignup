@@ -71,6 +71,110 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          message: string
+          phone_number: string
+          school_name: string | null
+          support_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          message: string
+          phone_number: string
+          school_name?: string | null
+          support_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          message?: string
+          phone_number?: string
+          school_name?: string | null
+          support_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      discount_code_usage: {
+        Row: {
+          discount_code_id: string
+          email: string
+          id: string
+          used_at: string
+        }
+        Insert: {
+          discount_code_id: string
+          email: string
+          id?: string
+          used_at?: string
+        }
+        Update: {
+          discount_code_id?: string
+          email?: string
+          id?: string
+          used_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_code_usage_discount_code_id_fkey"
+            columns: ["discount_code_id"]
+            isOneToOne: false
+            referencedRelation: "discount_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_codes: {
+        Row: {
+          code_number: string
+          code_title: string
+          code_type: string
+          created_at: string
+          expiration_date: string
+          flat_amount: number | null
+          id: string
+          is_active: boolean
+          percentage: number | null
+          updated_at: string
+          usage_count_per_email: number
+        }
+        Insert: {
+          code_number: string
+          code_title: string
+          code_type: string
+          created_at?: string
+          expiration_date: string
+          flat_amount?: number | null
+          id?: string
+          is_active?: boolean
+          percentage?: number | null
+          updated_at?: string
+          usage_count_per_email?: number
+        }
+        Update: {
+          code_number?: string
+          code_title?: string
+          code_type?: string
+          created_at?: string
+          expiration_date?: string
+          flat_amount?: number | null
+          id?: string
+          is_active?: boolean
+          percentage?: number | null
+          updated_at?: string
+          usage_count_per_email?: number
+        }
+        Relationships: []
+      }
       payment_evidence: {
         Row: {
           amount_paid: number
@@ -183,6 +287,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      renewals: {
+        Row: {
+          base_amount: number
+          created_at: string
+          discount_amount: number | null
+          discount_code_id: string | null
+          email: string
+          id: string
+          payment_reference: string | null
+          payment_status: string | null
+          phone_number: string
+          school_name: string
+          selected_plan: string
+          student_count: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          base_amount: number
+          created_at?: string
+          discount_amount?: number | null
+          discount_code_id?: string | null
+          email: string
+          id?: string
+          payment_reference?: string | null
+          payment_status?: string | null
+          phone_number: string
+          school_name: string
+          selected_plan: string
+          student_count: number
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          base_amount?: number
+          created_at?: string
+          discount_amount?: number | null
+          discount_code_id?: string | null
+          email?: string
+          id?: string
+          payment_reference?: string | null
+          payment_status?: string | null
+          phone_number?: string
+          school_name?: string
+          selected_plan?: string
+          student_count?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "renewals_discount_code_id_fkey"
+            columns: ["discount_code_id"]
+            isOneToOne: false
+            referencedRelation: "discount_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       school_signups: {
         Row: {
