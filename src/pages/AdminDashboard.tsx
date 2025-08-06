@@ -18,6 +18,9 @@ const AdminDashboard = () => {
   const [pricingPlans, setPricingPlans] = useState<any[]>([]);
   const [adminConfigs, setAdminConfigs] = useState<any[]>([]);
   const [paymentEvidence, setPaymentEvidence] = useState<any[]>([]);
+  const [affiliates, setAffiliates] = useState<any[]>([]);
+  const [referralTracking, setReferralTracking] = useState<any[]>([]);
+  const [affiliateWithdrawals, setAffiliateWithdrawals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -73,17 +76,32 @@ const AdminDashboard = () => {
         pricingPlansResult,
         configsResult,
         evidenceResult,
+        affiliatesResult,
+        referralTrackingResult,
+        affiliateWithdrawalsResult,
       ] = await Promise.all([
         supabase.from("school_signups").select("*").order("created_at", { ascending: false }),
         supabase.from("pricing_plans").select("*").order("sort_order"),
         supabase.from("admin_configs").select("*"),
         supabase.from("payment_evidence").select("*").order("created_at", { ascending: false }),
+        supabase.from("affiliate_profiles").select("*").order("created_at", { ascending: false }),
+        supabase.from("referral_tracking").select(`
+          *,
+          affiliate_profiles (username, full_name)
+        `).order("visited_at", { ascending: false }),
+        supabase.from("affiliate_withdrawals").select(`
+          *,
+          affiliate_profiles (username, full_name)
+        `).order("created_at", { ascending: false }),
       ]);
 
       setSchoolSignups(schoolSignupsResult.data || []);
       setPricingPlans(pricingPlansResult.data || []);
       setAdminConfigs(configsResult.data || []);
       setPaymentEvidence(evidenceResult.data || []);
+      setAffiliates(affiliatesResult.data || []);
+      setReferralTracking(referralTrackingResult.data || []);
+      setAffiliateWithdrawals(affiliateWithdrawalsResult.data || []);
 
       // Set config values
       const configs = configsResult.data || [];
@@ -153,6 +171,45 @@ const AdminDashboard = () => {
     }
   };
 
+  const toggleAffiliateStatus = async (affiliateId: string, isActive: boolean) => {
+    const { error } = await supabase
+      .from("affiliate_profiles")
+      .update({ is_active: !isActive })
+      .eq("id", affiliateId);
+
+    if (error) {
+      toast.error("Failed to update affiliate status");
+    } else {
+      toast.success("Affiliate status updated");
+      loadData();
+    }
+  };
+
+  const processWithdrawal = async (withdrawalId: string, status: string, notes?: string) => {
+    const { error } = await supabase
+      .from("affiliate_withdrawals")
+      .update({ 
+        status, 
+        notes,
+        processed_at: status === 'approved' ? new Date().toISOString() : null 
+      })
+      .eq("id", withdrawalId);
+
+    if (error) {
+      toast.error("Failed to process withdrawal");
+    } else {
+      toast.success(`Withdrawal ${status}`);
+      loadData();
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN'
+    }).format(amount);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -197,6 +254,10 @@ const AdminDashboard = () => {
               <FileText className="h-4 w-4" />
               Payment Evidence
             </TabsTrigger>
+            <TabsTrigger value="affiliates" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Affiliates
+            </TabsTrigger>
             <TabsTrigger value="config" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Configuration
@@ -222,6 +283,24 @@ const AdminDashboard = () => {
                 <CardContent className="p-6">
                   <h3 className="text-sm font-medium text-muted-foreground">Completed Payments</h3>
                   <p className="text-2xl font-bold">{schoolSignups.filter(s => s.payment_status === 'completed').length}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-sm font-medium text-muted-foreground">Total Affiliates</h3>
+                  <p className="text-2xl font-bold">{affiliates.length}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-sm font-medium text-muted-foreground">Active Affiliates</h3>
+                  <p className="text-2xl font-bold">{affiliates.filter(a => a.is_active).length}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-sm font-medium text-muted-foreground">Total Referrals</h3>
+                  <p className="text-2xl font-bold">{referralTracking.length}</p>
                 </CardContent>
               </Card>
             </div>
@@ -412,6 +491,176 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Affiliates Tab */}
+          <TabsContent value="affiliates">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Affiliate Management</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Username</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Phone</TableHead>
+                          <TableHead>Total Earnings</TableHead>
+                          <TableHead>Referrals</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {affiliates.map((affiliate) => (
+                          <TableRow key={affiliate.id}>
+                            <TableCell className="font-medium">{affiliate.full_name}</TableCell>
+                            <TableCell>{affiliate.username}</TableCell>
+                            <TableCell>{affiliate.email}</TableCell>
+                            <TableCell>{affiliate.phone_number}</TableCell>
+                            <TableCell>{formatCurrency(affiliate.total_earnings)}</TableCell>
+                            <TableCell>{affiliate.total_referrals}</TableCell>
+                            <TableCell>
+                              <Badge variant={affiliate.is_active ? "default" : "secondary"}>
+                                {affiliate.is_active ? "Active" : "Inactive"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => toggleAffiliateStatus(affiliate.id, affiliate.is_active)}
+                              >
+                                {affiliate.is_active ? "Deactivate" : "Activate"}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Withdrawal Requests</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Affiliate</TableHead>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Requested Date</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {affiliateWithdrawals.map((withdrawal) => (
+                          <TableRow key={withdrawal.id}>
+                            <TableCell className="font-medium">
+                              {withdrawal.affiliate_profiles?.full_name || 'Unknown'}
+                            </TableCell>
+                            <TableCell>{formatCurrency(withdrawal.amount)}</TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  withdrawal.status === 'approved' ? 'default' : 
+                                  withdrawal.status === 'rejected' ? 'destructive' : 
+                                  'secondary'
+                                }
+                              >
+                                {withdrawal.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{new Date(withdrawal.requested_at).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              {withdrawal.status === 'pending' && (
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => processWithdrawal(withdrawal.id, 'approved')}
+                                  >
+                                    Approve
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => processWithdrawal(withdrawal.id, 'rejected', 'Rejected by admin')}
+                                  >
+                                    Reject
+                                  </Button>
+                                </div>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Referral Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Affiliate</TableHead>
+                          <TableHead>Referral Code</TableHead>
+                          <TableHead>Converted</TableHead>
+                          <TableHead>Commission</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {referralTracking.slice(0, 20).map((tracking) => (
+                          <TableRow key={tracking.id}>
+                            <TableCell>{new Date(tracking.visited_at).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              {tracking.affiliate_profiles?.full_name || 'Unknown'}
+                            </TableCell>
+                            <TableCell>{tracking.referral_code}</TableCell>
+                            <TableCell>
+                              <Badge variant={tracking.converted ? "default" : "secondary"}>
+                                {tracking.converted ? "Yes" : "No"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {tracking.converted ? formatCurrency(tracking.commission_earned) : "₦0"}
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  tracking.commission_status === 'paid' ? 'default' : 
+                                  tracking.commission_status === 'approved' ? 'secondary' : 
+                                  'outline'
+                                }
+                              >
+                                {tracking.commission_status}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Configuration Tab */}

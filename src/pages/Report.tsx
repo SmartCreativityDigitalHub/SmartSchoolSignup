@@ -21,7 +21,9 @@ const Report = () => {
   const totalPages = Math.ceil(totalRecords / recordsPerPage);
 
   const categories = [
-    { value: "affiliates", label: "Affiliate" },
+    { value: "affiliate_profiles", label: "Affiliate Profiles" },
+    { value: "referral_tracking", label: "Referral Tracking" },
+    { value: "affiliate_withdrawals", label: "Affiliate Withdrawals" },
     { value: "contact_messages", label: "Contact Messages" },
     { value: "discount_codes", label: "Discount Codes" },
     { value: "renewals", label: "Renewals" },

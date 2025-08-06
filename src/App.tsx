@@ -18,6 +18,9 @@ import AllPages from "./pages/AllPages";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import OfflineRenewalPayment from "./pages/OfflineRenewalPayment";
+import AffiliateSignup from "./pages/AffiliateSignup";
+import AffiliateLogin from "./pages/AffiliateLogin";
+import AffiliateDashboard from "./pages/AffiliateDashboard";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +45,9 @@ const App = () => (
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/offline-renewal-payment" element={<OfflineRenewalPayment />} />
+          <Route path="/affiliate-signup" element={<AffiliateSignup />} />
+          <Route path="/affiliate-login" element={<AffiliateLogin />} />
+          <Route path="/affiliate-dashboard" element={<AffiliateDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

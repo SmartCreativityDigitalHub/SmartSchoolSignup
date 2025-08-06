@@ -41,6 +41,113 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_profiles: {
+        Row: {
+          bank_account_name: string
+          bank_account_number: string
+          bank_name: string
+          commission_rate: number | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean | null
+          paid_earnings: number | null
+          pending_earnings: number | null
+          phone_number: string
+          state_location: string
+          total_earnings: number | null
+          total_referrals: number | null
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          bank_account_name: string
+          bank_account_number: string
+          bank_name: string
+          commission_rate?: number | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          paid_earnings?: number | null
+          pending_earnings?: number | null
+          phone_number: string
+          state_location: string
+          total_earnings?: number | null
+          total_referrals?: number | null
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          bank_account_name?: string
+          bank_account_number?: string
+          bank_name?: string
+          commission_rate?: number | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          paid_earnings?: number | null
+          pending_earnings?: number | null
+          phone_number?: string
+          state_location?: string
+          total_earnings?: number | null
+          total_referrals?: number | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      affiliate_withdrawals: {
+        Row: {
+          affiliate_id: string
+          amount: number
+          created_at: string
+          id: string
+          notes: string | null
+          processed_at: string | null
+          requested_at: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          affiliate_id: string
+          amount: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          requested_at?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          affiliate_id?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          requested_at?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_withdrawals_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       affiliates: {
         Row: {
           code: string
@@ -175,6 +282,51 @@ export type Database = {
         }
         Relationships: []
       }
+      offline_subscription_renewals: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          notes: string | null
+          payment_date: string
+          payment_evidence_url: string | null
+          payment_method: string | null
+          phone_number: string
+          school_name: string
+          selected_plan: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          notes?: string | null
+          payment_date: string
+          payment_evidence_url?: string | null
+          payment_method?: string | null
+          phone_number: string
+          school_name: string
+          selected_plan: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_evidence_url?: string | null
+          payment_method?: string | null
+          phone_number?: string
+          school_name?: string
+          selected_plan?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_evidence: {
         Row: {
           amount_paid: number
@@ -288,6 +440,53 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_tracking: {
+        Row: {
+          affiliate_id: string
+          commission_earned: number | null
+          commission_status: string | null
+          converted: boolean | null
+          id: string
+          referral_code: string
+          signup_id: string | null
+          user_agent: string | null
+          visited_at: string
+          visitor_ip: string | null
+        }
+        Insert: {
+          affiliate_id: string
+          commission_earned?: number | null
+          commission_status?: string | null
+          converted?: boolean | null
+          id?: string
+          referral_code: string
+          signup_id?: string | null
+          user_agent?: string | null
+          visited_at?: string
+          visitor_ip?: string | null
+        }
+        Update: {
+          affiliate_id?: string
+          commission_earned?: number | null
+          commission_status?: string | null
+          converted?: boolean | null
+          id?: string
+          referral_code?: string
+          signup_id?: string | null
+          user_agent?: string | null
+          visited_at?: string
+          visitor_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_tracking_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       renewals: {
         Row: {
           base_amount: number
@@ -296,6 +495,7 @@ export type Database = {
           discount_code_id: string | null
           email: string
           id: string
+          online_payment_status: string | null
           payment_reference: string | null
           payment_status: string | null
           phone_number: string
@@ -312,6 +512,7 @@ export type Database = {
           discount_code_id?: string | null
           email: string
           id?: string
+          online_payment_status?: string | null
           payment_reference?: string | null
           payment_status?: string | null
           phone_number: string
@@ -328,6 +529,7 @@ export type Database = {
           discount_code_id?: string | null
           email?: string
           id?: string
+          online_payment_status?: string | null
           payment_reference?: string | null
           payment_status?: string | null
           phone_number?: string
@@ -364,6 +566,7 @@ export type Database = {
           employee_religion: string | null
           id: string
           mobile_no: string
+          online_payment_status: string | null
           payment_status: string | null
           payment_type: string
           referral_code: string | null
@@ -390,6 +593,7 @@ export type Database = {
           employee_religion?: string | null
           id?: string
           mobile_no: string
+          online_payment_status?: string | null
           payment_status?: string | null
           payment_type: string
           referral_code?: string | null
@@ -416,6 +620,7 @@ export type Database = {
           employee_religion?: string | null
           id?: string
           mobile_no?: string
+          online_payment_status?: string | null
           payment_status?: string | null
           payment_type?: string
           referral_code?: string | null

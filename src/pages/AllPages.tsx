@@ -63,6 +63,24 @@ const AllPages = () => {
       path: "/report",
       description: "Data reports and analytics",
       icon: FileText
+    },
+    {
+      name: "Affiliate Registration",
+      path: "/affiliate-signup",
+      description: "Join our affiliate program",
+      icon: Users
+    },
+    {
+      name: "Affiliate Login",
+      path: "/affiliate-login",
+      description: "Access affiliate dashboard",
+      icon: Users
+    },
+    {
+      name: "Affiliate Dashboard",
+      path: "/affiliate-dashboard",
+      description: "Affiliate earnings and stats",
+      icon: BarChart3
     }
   ];
 
