@@ -59,7 +59,7 @@ const AffiliateDashboard = () => {
         return;
       }
 
-      // Fetch affiliate profile using maybeSingle to handle no results gracefully
+      // Fetch affiliate profile using the authenticated user's ID
       const { data: profileData, error: profileError } = await supabase
         .from('affiliate_profiles')
         .select('*')
