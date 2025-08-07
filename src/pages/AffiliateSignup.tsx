@@ -15,6 +15,7 @@ const affiliateSchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
   phoneNumber: z.string().min(10, "Valid phone number is required"),
   email: z.string().email("Valid email is required"),
+  country: z.string().min(2, "Country is required"),
   stateLocation: z.string().min(2, "State/Location is required"),
   username: z.string().min(3, "Username must be at least 3 characters").regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
   bankAccountName: z.string().min(2, "Account name is required"),
@@ -29,22 +30,28 @@ const affiliateSchema = z.object({
 
 type AffiliateFormData = z.infer<typeof affiliateSchema>;
 
-const nigerianStates = [
-  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", 
-  "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe", 
-  "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", 
-  "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", 
-  "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
+const countries = [
+  "Nigeria", "Ghana", "Kenya", "South Africa", "Uganda", "Tanzania", "Rwanda", "Zambia", "Botswana", "Ethiopia"
 ];
 
-const nigerianBanks = [
-  "Access Bank", "Citibank", "Ecobank", "Fidelity Bank", "First Bank", 
-  "First City Monument Bank (FCMB)", "Globus Bank", "Guaranty Trust Bank (GTBank)", 
-  "Heritage Bank", "Keystone Bank", "Polaris Bank", "Providus Bank", 
-  "Stanbic IBTC Bank", "Standard Chartered Bank", "Sterling Bank", 
-  "SunTrust Bank", "Union Bank", "United Bank for Africa (UBA)", 
-  "Unity Bank", "Wema Bank", "Zenith Bank"
-];
+const statesByCountry: Record<string, string[]> = {
+  "Nigeria": [
+    "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", 
+    "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe", 
+    "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", 
+    "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", 
+    "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
+  ],
+  "Ghana": ["Greater Accra", "Ashanti", "Western", "Eastern", "Central", "Northern", "Upper East", "Upper West", "Volta", "Brong-Ahafo"],
+  "Kenya": ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Nyeri", "Machakos", "Meru", "Thika", "Garissa"],
+  "South Africa": ["Gauteng", "Western Cape", "KwaZulu-Natal", "Eastern Cape", "Limpopo", "Mpumalanga", "North West", "Free State", "Northern Cape"],
+  "Uganda": ["Kampala", "Wakiso", "Mukono", "Jinja", "Gulu", "Lira", "Mbarara", "Kasese", "Masaka", "Hoima"],
+  "Tanzania": ["Dar es Salaam", "Mwanza", "Arusha", "Dodoma", "Mbeya", "Morogoro", "Tanga", "Kahama", "Tabora", "Zanzibar"],
+  "Rwanda": ["Kigali", "Eastern", "Northern", "Southern", "Western"],
+  "Zambia": ["Lusaka", "Copperbelt", "Southern", "Eastern", "Western", "Northern", "North-Western", "Central", "Luapula", "Muchinga"],
+  "Botswana": ["Gaborone", "Francistown", "Molepolole", "Maun", "Lobatse", "Selibe Phikwe", "Kanye", "Serowe", "Mahalapye", "Palapye"],
+  "Ethiopia": ["Addis Ababa", "Dire Dawa", "Mekelle", "Gondar", "Awasa", "Bahir Dar", "Dessie", "Jimma", "Jijiga", "Shashamane"]
+};
 
 const AffiliateSignup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +60,13 @@ const AffiliateSignup = () => {
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<AffiliateFormData>({
     resolver: zodResolver(affiliateSchema),
+    defaultValues: {
+      country: "Nigeria"
+    }
   });
+
+  const selectedCountry = watch("country");
+  const availableStates = selectedCountry ? statesByCountry[selectedCountry] || [] : [];
 
   const onSubmit = async (data: AffiliateFormData) => {
     setIsSubmitting(true);
@@ -64,7 +77,7 @@ const AffiliateSignup = () => {
         .from('affiliate_profiles')
         .select('username')
         .eq('username', data.username)
-        .single();
+        .maybeSingle();
 
       if (existingAffiliate) {
         toast({
@@ -101,6 +114,7 @@ const AffiliateSignup = () => {
           full_name: data.fullName,
           phone_number: data.phoneNumber,
           email: data.email,
+          country: data.country,
           state_location: data.stateLocation,
           username: data.username,
           bank_account_name: data.bankAccountName,
@@ -139,7 +153,7 @@ const AffiliateSignup = () => {
               Join Our Affiliate Program
             </CardTitle>
             <CardDescription className="text-lg">
-              Earn commissions by referring schools to SmartSchool CMS
+              Earn Commissions by referring schools to SmartSchool Portal
             </CardDescription>
           </CardHeader>
           
@@ -185,15 +199,40 @@ const AffiliateSignup = () => {
                 )}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="country">Country *</Label>
+                <Select onValueChange={(value) => {
+                  setValue("country", value);
+                  setValue("stateLocation", ""); // Reset state when country changes
+                }}>
+                  <SelectTrigger className={errors.country ? "border-destructive" : ""}>
+                    <SelectValue placeholder="Select Country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.country && (
+                  <p className="text-sm text-destructive">{errors.country.message}</p>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="stateLocation">State/Location *</Label>
-                  <Select onValueChange={(value) => setValue("stateLocation", value)}>
+                  <Select 
+                    onValueChange={(value) => setValue("stateLocation", value)}
+                    disabled={!selectedCountry}
+                  >
                     <SelectTrigger className={errors.stateLocation ? "border-destructive" : ""}>
-                      <SelectValue placeholder="Select State" />
+                      <SelectValue placeholder={selectedCountry ? "Select State" : "Select Country First"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {nigerianStates.map((state) => (
+                      {availableStates.map((state) => (
                         <SelectItem key={state} value={state}>
                           {state}
                         </SelectItem>
@@ -249,18 +288,12 @@ const AffiliateSignup = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="bankName">Bank Name *</Label>
-                    <Select onValueChange={(value) => setValue("bankName", value)}>
-                      <SelectTrigger className={errors.bankName ? "border-destructive" : ""}>
-                        <SelectValue placeholder="Select Bank" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {nigerianBanks.map((bank) => (
-                          <SelectItem key={bank} value={bank}>
-                            {bank}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      id="bankName"
+                      {...register("bankName")}
+                      className={errors.bankName ? "border-destructive" : ""}
+                      placeholder="Enter your bank name"
+                    />
                     {errors.bankName && (
                       <p className="text-sm text-destructive">{errors.bankName.message}</p>
                     )}

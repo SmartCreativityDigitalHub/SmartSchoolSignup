@@ -21,6 +21,7 @@ import OfflineRenewalPayment from "./pages/OfflineRenewalPayment";
 import AffiliateSignup from "./pages/AffiliateSignup";
 import AffiliateLogin from "./pages/AffiliateLogin";
 import AffiliateDashboard from "./pages/AffiliateDashboard";
+import AffiliateForgotPassword from "./pages/AffiliateForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/affiliate-signup" element={<AffiliateSignup />} />
           <Route path="/affiliate-login" element={<AffiliateLogin />} />
           <Route path="/affiliate-dashboard" element={<AffiliateDashboard />} />
+          <Route path="/affiliate-forgot-password" element={<AffiliateForgotPassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

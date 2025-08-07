@@ -125,7 +125,13 @@ const AffiliateLogin = () => {
               </Button>
             </form>
 
-            <div className="text-center mt-6">
+            <div className="text-center mt-6 space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Forgot your password?{" "}
+                <Link to="/affiliate-forgot-password" className="text-primary hover:underline">
+                  Reset it here
+                </Link>
+              </p>
               <p className="text-sm text-muted-foreground">
                 Don't have an affiliate account?{" "}
                 <Link to="/affiliate-signup" className="text-primary hover:underline">

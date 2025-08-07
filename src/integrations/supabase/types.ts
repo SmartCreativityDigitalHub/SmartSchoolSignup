@@ -47,6 +47,7 @@ export type Database = {
           bank_account_number: string
           bank_name: string
           commission_rate: number | null
+          country: string
           created_at: string
           email: string
           full_name: string
@@ -67,6 +68,7 @@ export type Database = {
           bank_account_number: string
           bank_name: string
           commission_rate?: number | null
+          country?: string
           created_at?: string
           email: string
           full_name: string
@@ -87,6 +89,7 @@ export type Database = {
           bank_account_number?: string
           bank_name?: string
           commission_rate?: number | null
+          country?: string
           created_at?: string
           email?: string
           full_name?: string
