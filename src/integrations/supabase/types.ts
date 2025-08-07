@@ -60,7 +60,7 @@ export type Database = {
           total_earnings: number | null
           total_referrals: number | null
           updated_at: string
-          user_id: string
+          user_id: string | null
           username: string
         }
         Insert: {
@@ -81,7 +81,7 @@ export type Database = {
           total_earnings?: number | null
           total_referrals?: number | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           username: string
         }
         Update: {
@@ -102,7 +102,7 @@ export type Database = {
           total_earnings?: number | null
           total_referrals?: number | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           username?: string
         }
         Relationships: []

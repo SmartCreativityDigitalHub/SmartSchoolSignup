@@ -52,18 +52,39 @@ const AffiliateDashboard = () => {
           description: "Please log in to access your dashboard.",
           variant: "destructive",
         });
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/affiliate-login';
+        }, 2000);
         return;
       }
 
-      // Fetch affiliate profile
+      // Fetch affiliate profile using maybeSingle to handle no results gracefully
       const { data: profileData, error: profileError } = await supabase
         .from('affiliate_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
         console.error('Error fetching profile:', profileError);
+        toast({
+          title: "Error",
+          description: "Failed to load your affiliate profile. Please try logging in again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!profileData) {
+        toast({
+          title: "Profile Not Found",
+          description: "No affiliate profile found. Please complete your signup first.",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = '/affiliate-signup';
+        }, 2000);
         return;
       }
 
@@ -78,12 +99,17 @@ const AffiliateDashboard = () => {
 
       if (referralError) {
         console.error('Error fetching referrals:', referralError);
-        return;
+        // Don't return here, just log the error and continue with empty referrals
       }
 
       setReferrals(referralData || []);
     } catch (error) {
       console.error('Error fetching affiliate data:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
