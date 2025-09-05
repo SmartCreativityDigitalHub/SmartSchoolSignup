@@ -12,6 +12,8 @@ const features = [
   { name: "Results Management", starter: true, standard: true },
   { name: "Attendance (Student/Teacher/Others)", starter: true, standard: true },
   { name: "Internal Messaging", starter: true, standard: true },
+  { name: "Digital Library", starter: true, standard: true },
+  { name: "Lesson Note", starter: true, standard: true },
   { name: "Email / SMS", starter: false, standard: true },
   { name: "Media Sharing", starter: false, standard: true },
   { name: "School Website", starter: false, standard: true },
